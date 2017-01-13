@@ -50,14 +50,12 @@
 
 .seconds-container {
   position: static;
-  /*top: 450px;*/
   top: 50px;
   right: 0;
   bottom: 0;
   left: 0;
   width: 250px;
   height: 250px;
-  /*background-color: powderblue;*/
 }
 
 .seconds {
@@ -80,32 +78,9 @@
 
 
 /*css for reseting clock*/
-.newStyles-container{
-  position: absolute;
-  top: 250px;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  width: 500px;
-  height: 500px;
-  background-color: powderblue;
-}
 
-.newStyles{
-  background: #000;/*tick color*/
-  height: 40%;/*tick size */
-  left: 50%;
-  position: absolute;
-  top: 10%;
-  transform-origin: 50% 100%;
-  width: 1%;
-}
-body {
-    padding: 50px;
-}
 .scrollingContainer {
     overflow: scroll;
     height: 450px;
     background-color: #3E8EDE;
-    overflow-x: hidden;
 }
