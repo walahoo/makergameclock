@@ -3,7 +3,7 @@
 <head>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-<link rel="stylesheet" type="text/css" href="index.css">
+<link rel="stylesheet" type="text/css" href="index3.css">
 
 <!-- CLOCK SCRIPT -->
   <script> 
@@ -24,16 +24,20 @@
       var timeCounter = 0;//count total time moved
       var intervalCounter = 0;//current interval clock is at, a factor of interval  
       var store = 0;
+      var indivTiming = 0;
       //fcns to set variables to values inputed by user
       function setGroupNumbers(){
         groupNumbers = $('#groups').val();
+        if (groupNumbers > 12){
+          window.alert("Please enter a number 12 or less.");
+        }
       }
       function setTotalTime(){
         totalTime = $('#time').val();
       }
 
       function setTotalTimeMS(){
-        totalTimeMS = totalTime * 1000;
+        totalTimeMS = totalTime;
       }
 
       function setPauseTime(){
@@ -45,7 +49,7 @@
         if ((groupNumbers == 0 || groupNumbers == 1) && totalTime != 0){
           indivTime = totalTime * 1000;
         //input both zero, don't run clock and set clockRunning to false value    
-        }else if ((groupNumbers == 0 || groupNumbers == 1) && totalTime == 0){  
+        }else if ((groupNumbers == 0 || groupNumbers == 1) && totalTime == 0){ 
           indivTime = 0;
         }else {
           indivTime = totalTime/groupNumbers *1000; 
@@ -65,47 +69,67 @@
         var d = new Date();
         startTime = d.getTime();
       }
+
+      function setIndivTimeCountdown(){
+        indivTiming = (totalTime * 1000)/groups - 1;
+      }
       //call fcn to set all values 
       function setValues(){
         setGroupNumbers();
         setTotalTime();
         setTotalTimeMS();
         setIndivTime();
+        setIndivTimeCountdown();
         setStartTime();
         setInter();
         setTimeCounter();
         setPauseTime();
         setIntervalCounter();
       }
+
       //fcns for working clock 
       function startClock(){
         //set all values & variables
         setValues();
+
+
         var time = totalTime;
         var num = groupNumbers;
-        //disable start & continue button, bc already running
-        $('#start').prop('disabled', true);
-        $('#continue').prop('disabled', true);
-        $('#pause').prop('disabled', false);
-        $('#restart').prop('disabled', false);
-        $('#drawHedgehog').prop('disabled', false);
-        //set clock to elem so we can pause/run as needed
-        var elem = $('#seconds-container')[0];
-        var $elem = $('#seconds-container');
-        // console.log("Starting Clock, time = " + time + ", groups = " + num);
-        //run the clock 
-        elem.style.webkitAnimationPlayState = "running";
-        elem.style.animation = 'rotate ' + time + 's linear';
-        //set id so we can cleartimeout later as needed, initial stop is first interval 
 
-        timeoutID = setTimeout(pauseClock, indivTime);
+        //check if inputs are valid
+        if (num < 12 && num > 0){
+          if (time > 0){
+                //disable start & continue button, bc already running
+                $('#start').prop('disabled', true);
+                $('#continue').prop('disabled', true);
+                $('#pause').prop('disabled', false);
+                $('#restart').prop('disabled', false);
+                //set clock to elem so we can pause/run as needed
+                var elem = $('#seconds-container')[0];
+                var $elem = $('#seconds-container');
+                // console.log("Starting Clock, time = " + time + ", groups = " + num);
+                //run the clock & start timer
+                startTimer();
+                elem.style.webkitAnimationPlayState = "running";
+                elem.style.animation = 'rotate ' + time + 's linear';
+                //set id so we can cleartimeout later as needed, initial stop is first interval 
 
-        //when animation ends
-        $elem.one('webkitAnimationEnd animationend', function(){
-          // console.log("Animation finished!");
-          restartClock();
-          clearImages(ctx);
-        });
+                timeoutID = setTimeout(pauseClock, indivTime);
+
+                //when animation ends
+                $elem.one('webkitAnimationEnd animationend', function(){
+                  // console.log("Animation finished!");
+                  restartClock();
+                  clearImages(ctx);
+            });}
+          } else{
+            //input invalid
+            // console.log("input invalid.");
+            window.alert("input invalid");
+            restartClock();
+            restartTimer();
+
+          }
       }
 
 
@@ -179,38 +203,49 @@
       }
 // ///////////// fcns for timer countdown///////////////
       function pauseTimer(){
-        console.log("------------------");
-        console.log("pauseTimer called.");
+        // console.log("------------------");
+        // console.log("pauseTimer called.");
         //store = totalTimeMS;
-        console.log("pausetimer-intervalID called");
+        // console.log("pausetimer-intervalID called");
         clearInterval(intervalID);
         // clearInterval(intervalID);
       }
 
       function continueTimer(){
         //clear any previously existing setInterval's
-        console.log("continueTimer called.");
-        console.log("---------------------");
-        console.log("totalTimeMS: " + totalTimeMS);
-        
+        // console.log("continueTimer called.");
+        // console.log("---------------------");
+        // console.log("totalTimeMS: " + totalTimeMS);
+        totalTimeMS = totalTimeMS - 1;
+
         if (totalTimeMS >= 0){
-          totalTimeMS = totalTimeMS - 1000;
+          // totalTimeMS = totalTimeMS - 1000;
           $('#setCountdown').html(totalTimeMS);
           //need to start interval again 
         }//if time is zero or less than zero, clear interval
         else{
-          console.log("continue timer-clearInterval called.");
+          // console.log("continue timer-clearInterval called.");
           clearInterval(intervalID);}
       }
 
       function startTimer(){
-        console.log("start time: " + totalTimeMS);
-        console.log("groups: " + groupNumbers);
+        // console.log("start time: " + totalTimeMS);
+        // console.log("groups: " + groupNumbers);
         intervalID = setInterval(continueTimer, 1000);
+        indivIntervalID = setInterval(indivTimer, 1);
       }
 
       function restartTimer(){
         $('#setCountdown').html("Countdown Timer.");
+      }
+
+      function indivTimer(){ 
+        indivTiming = indivTiming - 1;
+        if (indivTiming >= 0){
+          $('#setIndiv').html(indivTiming);
+        }else{
+          clearInterval(indivIntervalID);
+        }
       }
 
       //when document loads set all values/variables 
@@ -466,7 +501,7 @@
                   <!-- buttons -->
                   <div class="button_wrapper">
                      <audio id="play" src="http://www.soundjay.com/button/beep-07.wav"></audio>
-                     <input class="start" id = "start" name = "submitbutton" type="button"   value = "start" onclick="startClock(); createInfoSheet(); drawClock();startTimer();">
+                     <input class="start" id = "start" name = "submitbutton" type="button"   value = "start" onclick="startClock(); createInfoSheet(); drawClock();">
                      <input  id = "pause" type="button" name = "pausebutton" value = "pause" onclick="pauseClock();">
                      <input id = "continue" type="button" name = "continuebutton" value = "continue" onclick="continueClock(); startTimer();">
                      <input id = "restart" type = "button" value = "restart" onclick = "restartClock();clearImages(ctx);">
@@ -476,6 +511,7 @@
             <!-- <p> *press hedgehog button twice for a surprise </p> -->
             <p id = "setIndivTime"></p>
             <p id = "setCountdown">Countdown</p>
+            <p id = "setIndiv"></p>
           </div>
         </div>
       </th><!--..................... end clock.....................-->
